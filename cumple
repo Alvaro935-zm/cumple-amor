@@ -27,9 +27,23 @@
       box-shadow: 0 4px 10px rgba(0,77,64,0.3);
       display: inline-block;
       max-width: 400px;
+      text-align: left;
     }
-    .button-rsvp {
-      margin-top: 20px;
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #004d40;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+    button {
       background-color: #00796b;
       color: white;
       border: none;
@@ -37,11 +51,16 @@
       border-radius: 25px;
       font-size: 1.1em;
       cursor: pointer;
-      text-decoration: none;
       display: inline-block;
     }
-    .button-rsvp:hover {
+    button:hover {
       background-color: #004d40;
+    }
+    .confirmation {
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
@@ -51,7 +70,79 @@
     <p>Ven a celebrar el cumpleaños de <strong>Silvana</strong>.</p>
     <p><strong>Fecha:</strong> 20 de Julio, 2025</p>
     <p><strong>Lugar:</strong> Cuadro Verde 150, Dpto 48</p>
-    <a href="mailto:tucorreo@ejemplo.com" class="button-rsvp">Confirmar Asistencia</a>
+
+    <form id="rsvp-form">
+      <label for="name">Nombre:</label>
+      <input type="text" id="name" name="name" required placeholder="Tu nombre" />
+      
+      <label for="attending">¿Asistirás?</label>
+      <select id="attending" name="attending" required>
+        <option value="">Selecciona</option>
+        <option value="Sí">Sí</option>
+        <option value="No">No</option>
+      </select>
+      
+      <button type="submit">Confirmar Asistencia</button>
+    </form>
+
+    <div id="confirmation-message" class="confirmation" style="display:none;"></div>
   </div>
+
+  <!-- Firebase SDK (modular) -->
+  <script type="module">
+    // Importar funciones necesarias de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+
+    // Tu configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDbm3CjznAyb5BUfivQ0xervBzBVFEvNnc",
+      authDomain: "cumple-75803.firebaseapp.com",
+      projectId: "cumple-75803",
+      storageBucket: "cumple-75803.firebasestorage.app",
+      messagingSenderId: "1098075718162",
+      appId: "1:1098075718162:web:2135240f95375f15dc8ecb",
+      measurementId: "G-7V3DJHP675"
+    };
+
+    // Inicializar Firebase y Analytics
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Referencia a formulario y mensaje
+    const form = document.getElementById('rsvp-form');
+    const confirmationMessage = document.getElementById('confirmation-message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const attending = form.attending.value;
+
+      if (!name || !attending) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
+
+      try {
+        // Guardar datos en Firestore colección "confirmaciones"
+        await addDoc(collection(db, "confirmaciones"), {
+          nombre: name,
+          asistencia: attending,
+          fecha: serverTimestamp()
+        });
+
+        confirmationMessage.style.display = 'block';
+        confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
+
+        form.reset();
+      } catch (error) {
+        alert("Error al enviar la confirmación. Intenta nuevamente.");
+        console.error("Error al guardar en Firestore: ", error);
+      }
+    });
+  </script>
 </body>
 </html>
