@@ -17,8 +17,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+      overflow-x: hidden;
     }
 
+    /* Contenedor principal */
     .invitation {
       background: white;
       padding: 40px 35px;
@@ -29,6 +32,8 @@
       width: 100%;
       text-align: left;
       transition: transform 0.3s ease;
+      position: relative; /* para estar por encima del fondo animado */
+      z-index: 10;
     }
     .invitation:hover {
       transform: scale(1.02);
@@ -102,9 +107,70 @@
       font-size: 1.3rem;
       text-align: center;
     }
+
+    /* Contenedor para animaciones en el fondo */
+    #background-anim {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    /* Estilos comunes para patitas */
+    .paw {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      opacity: 0.75;
+      filter: drop-shadow(0 0 1px rgba(0,0,0,0.2));
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    /* Animación para moverse de izquierda a derecha y reaparecer */
+    @keyframes pawMoveLeftToRight {
+      0% {
+        transform: translateX(-40px);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        transform: translateX(calc(100vw + 40px));
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(calc(100vw + 40px));
+      }
+    }
+
+    /* Animación para notas musicales Incubus */
+    .note {
+      position: absolute;
+      font-size: 18px;
+      color: #6a11cb;
+      opacity: 0.15;
+      animation-name: floatNote;
+      animation-duration: 12s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+    }
+
+    @keyframes floatNote {
+      0%, 100% { transform: translateY(0); opacity: 0.15;}
+      50% { transform: translateY(-15px); opacity: 0.3;}
+    }
   </style>
 </head>
 <body>
+
+  <div id="background-anim"></div>
+
   <div class="invitation">
     <h1>¡Estás Invitado!</h1>
     <p>Ven a celebrar el cumpleaños de <strong>Silvana</strong>.</p>
@@ -194,6 +260,77 @@
         console.error("Error al guardar en Firestore: ", error);
       }
     });
+
+    /* Animación fondo patitas + notas musicales */
+
+    const background = document.getElementById('background-anim');
+
+    // SVG patita negra (simplificada)
+    const pawBlack = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="50" r="10" fill="black"/>
+      <ellipse cx="20" cy="30" rx="6" ry="10" fill="black"/>
+      <ellipse cx="44" cy="30" rx="6" ry="10" fill="black"/>
+      <ellipse cx="27" cy="15" rx="5" ry="8" fill="black"/>
+      <ellipse cx="37" cy="15" rx="5" ry="8" fill="black"/>
+    </svg>`;
+
+    // SVG patita bicolor (negro + blanco)
+    const pawBicolor = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="50" r="10" fill="black"/>
+      <ellipse cx="20" cy="30" rx="6" ry="10" fill="white" />
+      <ellipse cx="44" cy="30" rx="6" ry="10" fill="black" />
+      <ellipse cx="27" cy="15" rx="5" ry="8" fill="white"/>
+      <ellipse cx="37" cy="15" rx="5" ry="8" fill="black"/>
+    </svg>`;
+
+    // Notas musicales para referencia a Incubus
+    const musicalNotes = ['♪', '♫', '♬'];
+
+    // Función para crear un elemento SVG patita
+    function createPaw(isBicolor) {
+      const div = document.createElement('div');
+      div.classList.add('paw');
+      div.style.top = `${Math.random() * 90}vh`; // altura aleatoria
+
+      // Alternamos tamaños para variación visual
+      const size = 20 + Math.random() * 15;
+      div.style.width = `${size}px`;
+      div.style.height = `${size}px`;
+
+      div.style.animationName = 'pawMoveLeftToRight';
+      div.style.animationDuration = `${10 + Math.random() * 10}s`;
+      div.style.animationDelay = `${Math.random() * 20}s`;
+
+      // Insertamos SVG
+      div.innerHTML = isBicolor ? pawBicolor : pawBlack;
+
+      return div;
+    }
+
+    // Crear algunas patitas para el fondo
+    for (let i = 0; i < 15; i++) {
+      const paw = createPaw(i % 2 === 0);
+      background.appendChild(paw);
+    }
+
+    // Función para crear nota musical
+    function createNote() {
+      const span = document.createElement('span');
+      span.classList.add('note');
+      span.style.top = `${Math.random() * 90}vh`;
+      span.style.left = `${Math.random() * 100}vw`;
+      span.style.animationDuration = `${10 + Math.random() * 10}s`;
+      span.style.animationDelay = `${Math.random() * 15}s`;
+      span.textContent = musicalNotes[Math.floor(Math.random() * musicalNotes.length)];
+      return span;
+    }
+
+    // Crear algunas notas musicales
+    for (let i = 0; i < 10; i++) {
+      const note = createNote();
+      background.appendChild(note);
+    }
+
   </script>
 </body>
 </html>
