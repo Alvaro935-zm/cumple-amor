@@ -111,7 +111,6 @@
     const form = document.getElementById('rsvp-form');
     const confirmationMessage = document.getElementById('confirmation-message');
 
-    // Función para encontrar un ID único basado en el nombre
     async function generateUniqueId(baseName) {
       let id = baseName;
       let count = 1;
@@ -120,10 +119,8 @@
         const docRef = doc(db, "confirmaciones", id);
         const docSnap = await getDoc(docRef);
         if (!docSnap.exists()) {
-          // No existe documento con ese id, lo usamos
           return id;
         }
-        // Ya existe, agregamos un número al final y probamos de nuevo
         id = baseName + "-" + count;
         count++;
       }
@@ -141,7 +138,6 @@
       }
 
       try {
-        // Generar ID único para evitar sobreescritura
         const uniqueId = await generateUniqueId(name);
 
         await setDoc(doc(db, "confirmaciones", uniqueId), {
