@@ -127,34 +127,36 @@
     }
 
     form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  e.preventDefault();
 
-      const name = form.name.value.trim();
-      const attending = form.attending.value;
+  const name = form.name.value.trim();
+  const attending = form.attending.value;
 
-      if (!name || !attending) {
-        alert("Por favor completa todos los campos.");
-        return;
-      }
+  if (!name || !attending) {
+    alert("Por favor completa todos los campos.");
+    return;
+  }
 
-      try {
-        const uniqueId = await generateUniqueId(name);
+  try {
+    const uniqueId = await generateUniqueId(name);
 
-        await setDoc(doc(db, "confirmaciones", uniqueId), {
-          nombre: name,
-          asistencia: attending,
-          fecha: serverTimestamp()
-        });
-
-        confirmationMessage.style.display = 'block';
-        confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
-
-        form.reset();
-      } catch (error) {
-        alert("Error al enviar la confirmación. Intenta nuevamente.");
-        console.error("Error al guardar en Firestore: ", error);
-      }
+    await setDoc(doc(db, "confirmaciones", uniqueId), {
+      nombre: name,
+      asistencia: attending,
+      fecha: serverTimestamp()
     });
+
+    confirmationMessage.style.display = 'block';
+    // Aquí está la línea corregida, sin mostrar el ID
+    confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
+
+    form.reset();
+  } catch (error) {
+    alert("Error al enviar la confirmación. Intenta nuevamente.");
+    console.error("Error al guardar en Firestore: ", error);
+  }
+});
+
   </script>
 </body>
 </html>
