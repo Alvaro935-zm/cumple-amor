@@ -17,11 +17,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      overflow-x: hidden;
     }
 
-    /* Contenedor principal */
     .invitation {
       background: white;
       padding: 40px 35px;
@@ -32,8 +29,6 @@
       width: 100%;
       text-align: left;
       transition: transform 0.3s ease;
-      position: relative; /* para estar por encima del fondo animado */
-      z-index: 10;
     }
     .invitation:hover {
       transform: scale(1.02);
@@ -107,70 +102,9 @@
       font-size: 1.3rem;
       text-align: center;
     }
-
-    /* Contenedor para animaciones en el fondo */
-    #background-anim {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 1;
-      overflow: visible;
-    }
-
-    /* Estilos comunes para patitas */
-    .paw {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      opacity: 0.75;
-      filter: drop-shadow(0 0 1px rgba(0,0,0,0.2));
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-    }
-
-    /* Animación para moverse de izquierda a derecha y reaparecer */
-    @keyframes pawMoveLeftToRight {
-      0% {
-        transform: translateX(-40px);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        transform: translateX(calc(100vw + 40px));
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(calc(100vw + 40px));
-      }
-    }
-
-    /* Animación para notas musicales Incubus */
-    .note {
-      position: absolute;
-      font-size: 18px;
-      color: #6a11cb;
-      opacity: 0.15;
-      animation-name: floatNote;
-      animation-duration: 12s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease-in-out;
-    }
-
-    @keyframes floatNote {
-      0%, 100% { transform: translateY(0); opacity: 0.15;}
-      50% { transform: translateY(-15px); opacity: 0.3;}
-    }
   </style>
 </head>
 <body>
-
-  <div id="background-anim"></div>
-
   <div class="invitation">
     <h1>¡Estás Invitado!</h1>
     <p>Ven a celebrar el cumpleaños de <strong>Silvana</strong>.</p>
@@ -260,75 +194,6 @@
         console.error("Error al guardar en Firestore: ", error);
       }
     });
-
-    /* Animación fondo patitas + notas musicales */
-
-    const background = document.getElementById('background-anim');
-
-    // SVG patita negra (simplificada)
-    const pawBlack = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="32" cy="50" r="10" fill="black"/>
-      <ellipse cx="20" cy="30" rx="6" ry="10" fill="black"/>
-      <ellipse cx="44" cy="30" rx="6" ry="10" fill="black"/>
-      <ellipse cx="27" cy="15" rx="5" ry="8" fill="black"/>
-      <ellipse cx="37" cy="15" rx="5" ry="8" fill="black"/>
-    </svg>`;
-
-    // SVG patita roja (simplificada)
-    const pawRed = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="32" cy="50" r="10" fill="#d62828"/>
-      <ellipse cx="20" cy="30" rx="6" ry="10" fill="#d62828"/>
-      <ellipse cx="44" cy="30" rx="6" ry="10" fill="#d62828"/>
-      <ellipse cx="27" cy="15" rx="5" ry="8" fill="#d62828"/>
-      <ellipse cx="37" cy="15" rx="5" ry="8" fill="#d62828"/>
-    </svg>`;
-
-    // Crear elemento patita y animarla
-    function createPaw(svgString, topPercent, delaySec, durationSec) {
-      const div = document.createElement('div');
-      div.classList.add('paw');
-      div.style.top = `${topPercent}%`;
-      div.style.left = '-40px';
-      div.style.animationName = 'pawMoveLeftToRight';
-      div.style.animationDuration = `${durationSec}s`;
-      div.style.animationDelay = `${delaySec}s`;
-      div.style.animationTimingFunction = 'linear';
-      div.style.animationIterationCount = 'infinite';
-      div.style.opacity = '0.75';
-
-      div.innerHTML = svgString;
-      background.appendChild(div);
-    }
-
-    // Crear varias patitas negras y rojas con distintos tiempos y alturas
-    createPaw(pawBlack, 60, 0, 25);
-    createPaw(pawBlack, 50, 7, 30);
-    createPaw(pawBlack, 55, 15, 20);
-
-    createPaw(pawRed, 65, 3, 35);
-    createPaw(pawRed, 52, 13, 28);
-    createPaw(pawRed, 58, 20, 22);
-
-    // Notas musicales (simple Unicode notes)
-    const notes = ['\u266A', '\u266B', '\u266C']; // ♪♫♬
-
-    function createNote(leftPercent, topPercent, delaySec, durationSec, scale) {
-      const span = document.createElement('span');
-      span.classList.add('note');
-      span.style.left = `${leftPercent}%`;
-      span.style.top = `${topPercent}%`;
-      span.style.animationDelay = `${delaySec}s`;
-      span.style.animationDuration = `${durationSec}s`;
-      span.style.transform = `scale(${scale})`;
-      span.textContent = notes[Math.floor(Math.random() * notes.length)];
-      background.appendChild(span);
-    }
-
-    createNote(10, 30, 0, 12, 1.1);
-    createNote(15, 40, 4, 14, 0.8);
-    createNote(25, 35, 2, 10, 1);
-    createNote(35, 45, 5, 16, 0.9);
-    createNote(40, 38, 7, 11, 1.2);
   </script>
 </body>
 </html>
