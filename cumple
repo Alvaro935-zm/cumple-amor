@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invitación Cumpleaños Silvana</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #e0f2f1;
+      color: #004d40;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0;
+    }
+    p {
+      font-size: 1.2em;
+      margin-top: 5px;
+    }
+    .invitation {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,77,64,0.3);
+      display: inline-block;
+      max-width: 400px;
+    }
+    .button-rsvp {
+      margin-top: 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .button-rsvp:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+  <div class="invitation">
+    <h1>¡Estás Invitado!</h1>
+    <p>Ven a celebrar el cumpleaños de <strong>Silvana</strong>.</p>
+    <p><strong>Fecha:</strong> 20 de Julio, 2025</p>
+    <p><strong>Lugar:</strong> Cuadro Verde 150, Dpto 48</p>
+    <a href="mailto:tucorreo@ejemplo.com" class="button-rsvp">Confirmar Asistencia</a>
+  </div>
+</body>
+</html>
