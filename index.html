@@ -91,7 +91,7 @@
   <!-- Firebase SDK (modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -111,6 +111,24 @@
     const form = document.getElementById('rsvp-form');
     const confirmationMessage = document.getElementById('confirmation-message');
 
+    // Función para encontrar un ID único basado en el nombre
+    async function generateUniqueId(baseName) {
+      let id = baseName;
+      let count = 1;
+
+      while (true) {
+        const docRef = doc(db, "confirmaciones", id);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          // No existe documento con ese id, lo usamos
+          return id;
+        }
+        // Ya existe, agregamos un número al final y probamos de nuevo
+        id = baseName + "-" + count;
+        count++;
+      }
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -123,15 +141,17 @@
       }
 
       try {
-        // Guardar datos en Firestore con ID = nombre del usuario
-        await setDoc(doc(db, "confirmaciones", name), {
+        // Generar ID único para evitar sobreescritura
+        const uniqueId = await generateUniqueId(name);
+
+        await setDoc(doc(db, "confirmaciones", uniqueId), {
           nombre: name,
           asistencia: attending,
           fecha: serverTimestamp()
         });
 
         confirmationMessage.style.display = 'block';
-        confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
+        confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada con el ID "${uniqueId}".`;
 
         form.reset();
       } catch (error) {
