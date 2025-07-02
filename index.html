@@ -29,14 +29,27 @@
       left: 0;
     }
 
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .invitation {
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
       position: relative;
       width: 90%;
       max-width: 420px;
       padding: 40px 35px;
       border-radius: 20px;
       background: url('https://raw.githubusercontent.com/Alvaro935-zm/cumple-amor/main/fondo.jpg') center/cover no-repeat;
-      border: 4px double #a14cd8; /* sugerencia 5 */
+      border: 4px double #a14cd8;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
       color: white;
       text-align: left;
@@ -52,7 +65,7 @@
 
     h1 {
       font-size: 2.8rem;
-      font-family: 'Great Vibes', cursive; /* sugerencia 6 */
+      font-family: 'Great Vibes', cursive;
       color: #4b0082;
       text-align: center;
       margin-top: 0;
@@ -91,7 +104,7 @@
     }
 
     .radio-group button {
-      position: relative; /* sugerencia 4 */
+      position: relative;
       padding: 10px 20px;
       font-size: 1rem;
       font-weight: bold;
@@ -101,7 +114,7 @@
       color: white;
       background: linear-gradient(to right, #a14cd8, #6a11cb);
       box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
-      overflow: hidden; /* sugerencia 4 */
+      overflow: hidden;
     }
 
     .radio-group button::after {
@@ -157,7 +170,7 @@
       }
 
       .invitation {
-        background-position: top center; /* sugerencia 7 */
+        background-position: top center;
       }
 
       h1 {
@@ -203,10 +216,19 @@
         <h2>Sugerencias de Regalos</h2>
         <ul id="gifts"></ul>
       </div>
+
+      <!-- Botón para ver en Google Maps -->
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="https://www.google.com/maps/search/?api=1&query=Cuadro+Verde+150,+Estación+Central" 
+           target="_blank"
+           style="display: inline-block; padding: 10px 20px; background-color: #4b0082; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          📍 Ver en Google Maps
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- Partículas animadas (sugerencia 8) -->
+  <!-- Partículas animadas -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
     particlesJS("particles-js", {
@@ -239,7 +261,7 @@
     });
   </script>
 
-  <!-- Tu script Firebase original -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
