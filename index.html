@@ -110,14 +110,14 @@
     }
 
     #gift-list {
-      margin-top: 35px;
+      margin-top: 30px;
       display: none;
     }
 
     #gift-list h2 {
       color: #4b0082;
+      font-size: 1.2rem;
       text-align: center;
-      font-size: 1.3rem;
       margin-bottom: 12px;
     }
 
@@ -129,7 +129,7 @@
     #gifts li {
       padding: 10px;
       border-bottom: 1px solid #ddd;
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: #444;
     }
   </style>
@@ -145,14 +145,14 @@
     <form id="rsvp-form">
       <label for="name">Nombre:</label>
       <input type="text" id="name" name="name" required placeholder="Tu nombre" />
-      
+
       <label for="attending">¿Asistirás?</label>
       <select id="attending" name="attending" required>
         <option value="">Selecciona</option>
         <option value="Sí">Sí</option>
         <option value="No">No</option>
       </select>
-      
+
       <button type="submit">Confirmar Asistencia</button>
     </form>
 
@@ -166,7 +166,15 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      serverTimestamp,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -185,6 +193,30 @@
 
     const form = document.getElementById('rsvp-form');
     const confirmationMessage = document.getElementById('confirmation-message');
+
+    async function mostrarListaDeRegalos() {
+      const giftList = document.getElementById("gift-list");
+      const giftsUl = document.getElementById("gifts");
+      giftsUl.innerHTML = "";
+
+      try {
+        const snapshot = await getDocs(collection(db, "regalos"));
+        if (snapshot.empty) {
+          giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
+        } else {
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const li = document.createElement("li");
+            li.textContent = data.nombre;
+            giftsUl.appendChild(li);
+          });
+        }
+
+        giftList.style.display = "block";
+      } catch (error) {
+        console.error("Error al obtener los regalos:", error);
+      }
+    }
 
     async function generateUniqueId(baseName) {
       let id = baseName;
@@ -225,33 +257,12 @@
         confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
 
         form.reset();
-        mostrarListaDeRegalos(); // mostrar sugerencias
+        mostrarListaDeRegalos();
       } catch (error) {
         alert("Error al enviar la confirmación. Intenta nuevamente.");
         console.error("Error al guardar en Firestore: ", error);
       }
     });
-
-    async function mostrarListaDeRegalos() {
-      const giftList = document.getElementById("gift-list");
-      const giftsUl = document.getElementById("gifts");
-
-      giftsUl.innerHTML = "";
-
-      const snapshot = await getDocs(collection(db, "regalos"));
-      if (snapshot.empty) {
-        giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
-      } else {
-        snapshot.forEach((docSnap) => {
-          const regalo = docSnap.data();
-          const li = document.createElement("li");
-          li.textContent = regalo.nombre;
-          giftsUl.appendChild(li);
-        });
-      }
-
-      giftList.style.display = "block";
-    }
   </script>
 </body>
 </html>
