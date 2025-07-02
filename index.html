@@ -10,7 +10,7 @@
     body {
       font-family: 'Poppins', Arial, sans-serif;
       background: linear-gradient(135deg, #f8e1f4, #e0c3fc);
-      color: #333;
+      color: #fff;
       text-align: center;
       padding: 50px 20px;
       min-height: 100vh;
@@ -31,24 +31,10 @@
       max-width: 420px;
       width: 100%;
       text-align: left;
-      transition: transform 0.3s ease;
+      position: relative;
       animation: fadeIn 0.8s ease-out;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .invitation::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: rgba(255, 255, 255, 0.85);
-      z-index: 0;
-      border-radius: 20px;
-    }
-
-    .invitation > * {
-      position: relative;
-      z-index: 1;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
     }
 
     @keyframes fadeIn {
@@ -56,15 +42,10 @@
       to   { opacity: 1; transform: scale(1); }
     }
 
-    .invitation:hover {
-      transform: scale(1.02);
-    }
-
     h1 {
       font-size: 2.6rem;
       font-weight: 600;
       margin-bottom: 10px;
-      color: #4b0082;
       text-align: center;
     }
 
@@ -72,33 +53,28 @@
       font-size: 1.1rem;
       margin: 6px 0 15px 0;
       line-height: 1.4;
-      color: #555;
     }
 
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: #4b0082;
     }
 
     input[type="text"] {
       width: 100%;
       padding: 12px 15px;
       margin-bottom: 20px;
-      border: 1.8px solid #ccc;
+      border: none;
       border-radius: 10px;
-      background: white;
+      background: rgba(255, 255, 255, 0.85);
       color: #333;
       font-size: 1.1rem;
       box-sizing: border-box;
-      transition: border-color 0.3s ease;
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #6a11cb;
-      box-shadow: 0 0 8px rgba(106, 17, 203, 0.4);
+    input[type="text"]::placeholder {
+      color: #666;
     }
 
     .radio-group {
@@ -124,14 +100,16 @@
     .radio-group button:hover {
       background: linear-gradient(to right, #b469f0, #7f2be0);
       transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(127, 43, 224, 0.6);
     }
 
     .confirmation {
       margin-top: 25px;
-      color: #228b22;
+      color: #00ff99;
       font-weight: 700;
       font-size: 1.3rem;
       text-align: center;
+      text-shadow: none;
     }
 
     #gift-list {
@@ -140,7 +118,6 @@
     }
 
     #gift-list h2 {
-      color: #4b0082;
       font-size: 1.2rem;
       text-align: center;
       margin-bottom: 12px;
@@ -155,7 +132,7 @@
       padding: 10px;
       border-bottom: 1px solid #ddd;
       font-size: 1rem;
-      color: #444;
+      color: #fff;
     }
 
     @media (max-width: 480px) {
@@ -188,6 +165,7 @@
     <form id="rsvp-form">
       <label for="name">Nombre:</label>
       <input type="text" id="name" name="name" required placeholder="Tu nombre" />
+
       <label>¿Asistirás?</label>
       <div class="radio-group">
         <button type="button" data-response="Sí">Sí</button>
@@ -220,7 +198,7 @@
       apiKey: "AIzaSyDbm3CjznAyb5BUfivQ0xervBzBVFEvNnc",
       authDomain: "cumple-75803.firebaseapp.com",
       projectId: "cumple-75803",
-      storageBucket: "cumple-75803.appspot.com",
+      storageBucket: "cumple-75803.firebasestorage.app",
       messagingSenderId: "1098075718162",
       appId: "1:1098075718162:web:2135240f95375f15dc8ecb",
       measurementId: "G-7V3DJHP675"
