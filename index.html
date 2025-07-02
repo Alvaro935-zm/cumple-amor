@@ -29,20 +29,7 @@
       left: 0;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     .invitation {
-      animation: fadeInUp 1s ease forwards;
-      opacity: 0;
       position: relative;
       width: 90%;
       max-width: 420px;
@@ -164,6 +151,33 @@
       color: #333;
     }
 
+    /* Contenedores de botones de descarga */
+    #download-container, #download-image-container {
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+      gap: 10px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    #download-container button, #download-image-container button {
+      padding: 8px 15px;
+      background: #4b0082;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      min-width: 180px;
+      transition: background-color 0.3s ease;
+    }
+
+    #download-container button:hover, #download-image-container button:hover {
+      background: #6a11cb;
+    }
+
     @media (max-width: 480px) {
       .overlay {
         padding: 20px;
@@ -184,6 +198,10 @@
 
       .radio-group button {
         width: 100%;
+      }
+
+      #download-container, #download-image-container {
+        flex-direction: column;
       }
     }
   </style>
@@ -217,13 +235,13 @@
         <ul id="gifts"></ul>
       </div>
 
-      <!-- Botón para ver en Google Maps -->
-      <div style="text-align: center; margin-top: 20px;">
-        <a href="https://www.google.com/maps/search/?api=1&query=Cuadro+Verde+150,+Estación+Central" 
-           target="_blank"
-           style="display: inline-block; padding: 10px 20px; background-color: #4b0082; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
-          📍 Ver en Google Maps
-        </a>
+      <!-- Botones descarga -->
+      <div id="download-container">
+        <button id="download-pdf">📥 Descargar lista en PDF</button>
+      </div>
+
+      <div id="download-image-container">
+        <button id="download-image">📥 Descargar lista como imagen</button>
       </div>
     </div>
   </div>
@@ -261,7 +279,12 @@
     });
   </script>
 
-  <!-- Firebase -->
+  <!-- jsPDF para PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- html2canvas para imagen -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Script Firebase original y descarga PDF/Imagen -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
@@ -295,13 +318,21 @@
     const nameInput = document.getElementById('name');
     const buttons = form.querySelectorAll('button[data-response]');
 
+    const downloadPdfBtn = document.getElementById('download-pdf');
+    const downloadImageBtn = document.getElementById('download-image');
+    const downloadContainer = document.getElementById('download-container');
+    const downloadImageContainer = document.getElementById('download-image-container');
+
+    // Variable global para lista de regalos
+    window.regalosParaExportar = [];
+
     async function mostrarListaDeRegalos() {
       const giftsUl = document.getElementById("gifts");
       giftsUl.innerHTML = "";
+      let regalos = [];
 
       try {
         const snapshot = await getDocs(collection(db, "regalos"));
-        const regalos = [];
 
         snapshot.forEach(docSnap => {
           const data = docSnap.data();
@@ -312,17 +343,26 @@
 
         if (regalos.length === 0) {
           giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
+          giftList.style.display = "block";
+          downloadContainer.style.display = 'none';
+          downloadImageContainer.style.display = 'none';
+          window.regalosParaExportar = [];
         } else {
           regalos.sort().forEach(nombre => {
             const li = document.createElement("li");
             li.textContent = nombre;
             giftsUl.appendChild(li);
           });
+          giftList.style.display = "block";
+          downloadContainer.style.display = 'flex';
+          downloadImageContainer.style.display = 'flex';
+          window.regalosParaExportar = regalos;
         }
 
-        giftList.style.display = "block";
       } catch (error) {
         console.error("Error al obtener los regalos:", error);
+        downloadContainer.style.display = 'none';
+        downloadImageContainer.style.display = 'none';
       }
     }
 
@@ -362,6 +402,8 @@
           mostrarListaDeRegalos();
         } else {
           giftList.style.display = "none";
+          downloadContainer.style.display = 'none';
+          downloadImageContainer.style.display = 'none';
         }
 
         form.reset();
@@ -375,6 +417,45 @@
       btn.addEventListener("click", () => {
         const response = btn.getAttribute("data-response");
         registrarConfirmacion(response);
+      });
+    });
+
+    // Descargar PDF con jsPDF
+    const { jsPDF } = window.jspdf;
+    downloadPdfBtn.addEventListener('click', () => {
+      if (window.regalosParaExportar && window.regalosParaExportar.length > 0) {
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("Lista de Sugerencias de Regalos", 14, 22);
+
+        doc.setFontSize(12);
+        let y = 40;
+        window.regalosParaExportar.forEach((regalo, i) => {
+          doc.text(`${i + 1}. ${regalo}`, 14, y);
+          y += 10;
+          if (y > 280) { // Salto de página simple
+            doc.addPage();
+            y = 20;
+          }
+        });
+
+        doc.save("lista_regalos.pdf");
+      } else {
+        alert("No hay sugerencias para descargar.");
+      }
+    });
+
+    // Descargar imagen con html2canvas
+    downloadImageBtn.addEventListener('click', () => {
+      const giftListElement = document.getElementById('gift-list');
+      html2canvas(giftListElement).then(canvas => {
+        canvas.toBlob(blob => {
+          const link = document.createElement('a');
+          link.download = 'lista_regalos.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
       });
     });
   </script>
