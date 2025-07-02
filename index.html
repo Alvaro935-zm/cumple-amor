@@ -132,6 +132,21 @@
       font-size: 1rem;
       color: #444;
     }
+
+    @media (max-width: 480px) {
+      .invitation {
+        padding: 25px 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 12px 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -147,7 +162,7 @@
       <input type="text" id="name" name="name" required placeholder="Tu nombre" />
 
       <label for="attending">¿Asistirás?</label>
-      <select id="attending" name="attending" required>
+      <select id="attending" name="attending" required aria-label="¿Asistirás?">
         <option value="">Selecciona</option>
         <option value="Sí">Sí</option>
         <option value="No">No</option>
@@ -201,13 +216,21 @@
 
       try {
         const snapshot = await getDocs(collection(db, "regalos"));
-        if (snapshot.empty) {
+        const regalos = [];
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          if (data.nombre) {
+            regalos.push(data.nombre);
+          }
+        });
+
+        if (regalos.length === 0) {
           giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
         } else {
-          snapshot.forEach(docSnap => {
-            const data = docSnap.data();
+          regalos.sort().forEach(nombre => {
             const li = document.createElement("li");
-            li.textContent = data.nombre;
+            li.textContent = nombre;
             giftsUl.appendChild(li);
           });
         }
@@ -256,6 +279,11 @@
         confirmationMessage.style.display = 'block';
         confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
 
+        // Oculta el mensaje después de 5 segundos
+        setTimeout(() => {
+          confirmationMessage.style.display = 'none';
+        }, 5000);
+
         form.reset();
         mostrarListaDeRegalos();
       } catch (error) {
@@ -266,4 +294,3 @@
   </script>
 </body>
 </html>
-
