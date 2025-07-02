@@ -133,52 +133,66 @@
       text-align: center;
     }
 
-    #gift-list {
-      display: none;
+    /* Contenedor lista y botones lado a lado */
+    #gift-and-buttons-container {
       margin-top: 20px;
+      display: none;
+      gap: 15px;
+      align-items: flex-start;
+      display: flex;
+    }
+
+    #gift-list {
+      flex: 1;
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      color: #333;
     }
 
     #gift-list h2 {
-      text-align: center;
+      margin-top: 0;
       color: #4b0082;
       font-size: 1.1rem;
+      text-align: center;
     }
 
     #gifts {
       list-style: none;
       padding-left: 0;
+      margin: 0;
     }
 
     #gifts li {
-      padding: 8px;
+      padding: 6px 8px;
       border-bottom: 1px solid #ccc;
       font-size: 1rem;
-      color: #333;
     }
 
-    /* Botones descarga y ubicación */
     #buttons-container {
-      display: none;
-      margin-top: 15px;
       display: flex;
-      justify-content: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 160px;
     }
 
     #buttons-container button {
-      flex: 1 1 140px;
-      max-width: 160px;
-      padding: 10px 15px;
+      padding: 12px 10px;
       background: #4b0082;
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s ease;
       white-space: nowrap;
       text-align: center;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(106,17,203,0.3);
+      transition: background-color 0.3s ease;
+      flex: 1;
     }
 
     #buttons-container button:hover {
@@ -199,27 +213,11 @@
       transition: background-color 0.3s ease;
       text-align: center;
       padding: 10px 0;
+      box-shadow: 0 4px 10px rgba(161,76,216,0.5);
     }
 
     #map-button:hover {
       background: #7f2be0;
-    }
-
-    /* Loader styles */
-    #loader {
-      display: none;
-      margin: 15px auto 0 auto;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #6a11cb;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
 
     @media (max-width: 480px) {
@@ -244,13 +242,18 @@
         width: 100%;
       }
 
-      #buttons-container {
+      #gift-and-buttons-container {
         flex-direction: column;
+      }
+
+      #buttons-container {
+        min-width: auto;
+        flex-direction: row;
         gap: 10px;
       }
 
       #buttons-container button {
-        max-width: 100%;
+        flex: 1;
       }
     }
   </style>
@@ -282,18 +285,17 @@
 
       <div id="confirmation-message" class="confirmation" style="display:none;"></div>
 
-      <!-- Loader -->
-      <div id="loader"></div>
+      <!-- Contenedor que agrupa lista y botones lado a lado -->
+      <div id="gift-and-buttons-container">
+        <div id="gift-list">
+          <h2>Sugerencias de Regalos</h2>
+          <ul id="gifts"></ul>
+        </div>
 
-      <div id="gift-list">
-        <h2>Sugerencias de Regalos</h2>
-        <ul id="gifts"></ul>
-      </div>
-
-      <!-- Botones descarga PDF e Imagen -->
-      <div id="buttons-container">
-        <button id="download-pdf">📥 Descargar PDF</button>
-        <button id="download-image">📥 Descargar imagen</button>
+        <div id="buttons-container">
+          <button id="download-pdf">📥 Descargar PDF</button>
+          <button id="download-image">📥 Descargar imagen</button>
+        </div>
       </div>
     </div>
   </div>
@@ -336,7 +338,6 @@
   <!-- html2canvas para imagen -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-  <!-- Script Firebase original + descargas + ubicación + loader -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
@@ -366,15 +367,13 @@
 
     const form = document.getElementById('rsvp-form');
     const confirmationMessage = document.getElementById('confirmation-message');
-    const giftList = document.getElementById('gift-list');
+    const giftAndButtonsContainer = document.getElementById('gift-and-buttons-container');
     const giftsUl = document.getElementById("gifts");
     const buttonsContainer = document.getElementById('buttons-container');
     const downloadPdfBtn = document.getElementById('download-pdf');
     const downloadImageBtn = document.getElementById('download-image');
     const mapButton = document.getElementById('map-button');
-    const loader = document.getElementById('loader');
     const nameInput = document.getElementById('name');
-    const buttons = form.querySelectorAll('button[data-response]');
 
     // URL ubicación Google Maps
     const googleMapsUrl = "https://www.google.com/maps/place/Cuadro+Verde+150,+Dpto+48+torre+5,+Estaci%C3%B3n+Central";
@@ -382,16 +381,10 @@
     // Variable global para guardar regalos cargados
     window.regalosParaExportar = [];
 
-    function showLoader(show) {
-      loader.style.display = show ? 'block' : 'none';
-    }
-
     async function mostrarListaDeRegalos() {
       giftsUl.innerHTML = "";
       window.regalosParaExportar = [];
-      showLoader(true);
-      buttonsContainer.style.display = 'none';
-      giftList.style.display = "none";
+      giftAndButtonsContainer.style.display = 'none'; // oculta mientras carga
 
       try {
         const snapshot = await getDocs(collection(db, "regalos"));
@@ -406,8 +399,6 @@
 
         if (regalos.length === 0) {
           giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
-          buttonsContainer.style.display = 'none';
-          giftList.style.display = "block";
         } else {
           regalos.sort().forEach(nombre => {
             const li = document.createElement("li");
@@ -415,15 +406,12 @@
             giftsUl.appendChild(li);
           });
           window.regalosParaExportar = regalos;
-          buttonsContainer.style.display = 'flex';
-          giftList.style.display = "block";
         }
+        giftAndButtonsContainer.style.display = 'flex'; // muestra lista y botones juntos
       } catch (error) {
         console.error("Error al obtener los regalos:", error);
         giftsUl.innerHTML = "<li>Error al cargar sugerencias.</li>";
-        giftList.style.display = "block";
-      } finally {
-        showLoader(false);
+        giftAndButtonsContainer.style.display = 'flex';
       }
     }
 
@@ -445,9 +433,6 @@
         alert("Por favor ingresa tu nombre antes de confirmar.");
         return;
       }
-      showLoader(true);
-      buttons.forEach(b => b.disabled = true);
-      nameInput.disabled = true;
       try {
         const uniqueId = await generateUniqueId(name);
         await setDoc(doc(db, "confirmaciones", uniqueId), {
@@ -459,10 +444,9 @@
         confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
 
         if (attending === "Sí") {
-          await mostrarListaDeRegalos();
+          mostrarListaDeRegalos();
         } else {
-          giftList.style.display = "none";
-          buttonsContainer.style.display = 'none';
+          giftAndButtonsContainer.style.display = 'none';
           window.regalosParaExportar = [];
         }
 
@@ -474,13 +458,10 @@
       } catch (error) {
         alert("Error al enviar la confirmación. Intenta nuevamente.");
         console.error("Error al guardar en Firestore: ", error);
-      } finally {
-        showLoader(false);
-        buttons.forEach(b => b.disabled = false);
-        nameInput.disabled = false;
       }
     }
 
+    const buttons = form.querySelectorAll('button[data-response]');
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         const response = btn.getAttribute("data-response");
@@ -517,7 +498,7 @@
 
     // Descargar imagen
     downloadImageBtn.addEventListener('click', () => {
-      html2canvas(giftList).then(canvas => {
+      html2canvas(document.getElementById('gift-list')).then(canvas => {
         canvas.toBlob(blob => {
           const link = document.createElement('a');
           link.download = 'lista_regalos.png';
@@ -533,5 +514,9 @@
       window.open(googleMapsUrl, '_blank');
     });
   </script>
+  <!-- jsPDF para PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- html2canvas para imagen -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
