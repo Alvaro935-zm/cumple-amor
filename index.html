@@ -134,8 +134,9 @@
     }
 
     #gift-list {
-      display: none;
       margin-top: 20px;
+      /* Siempre visible */
+      display: block;
     }
 
     #gift-list h2 {
@@ -158,12 +159,13 @@
 
     /* Botones descarga y ubicación */
     #buttons-container {
-      display: none;
       margin-top: 15px;
       display: flex;
       justify-content: center;
       gap: 15px;
       flex-wrap: wrap;
+      /* Siempre visible */
+      display: flex !important;
     }
 
     #buttons-container button {
@@ -376,7 +378,7 @@
 
         if (regalos.length === 0) {
           giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
-          buttonsContainer.style.display = 'none';
+          // Ya no ocultamos los botones ni lista
         } else {
           regalos.sort().forEach(nombre => {
             const li = document.createElement("li");
@@ -384,9 +386,12 @@
             giftsUl.appendChild(li);
           });
           window.regalosParaExportar = regalos;
-          buttonsContainer.style.display = 'flex';
-          giftList.style.display = "block";
         }
+
+        // Siempre mostrar lista y botones
+        giftList.style.display = "block";
+        buttonsContainer.style.display = "flex";
+
       } catch (error) {
         console.error("Error al obtener los regalos:", error);
       }
@@ -423,9 +428,11 @@
         if (attending === "Sí") {
           mostrarListaDeRegalos();
         } else {
-          giftList.style.display = "none";
-          buttonsContainer.style.display = 'none';
+          // Si no asiste, igual mostramos lista y botones vacíos
+          giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
           window.regalosParaExportar = [];
+          giftList.style.display = "block";
+          buttonsContainer.style.display = "flex";
         }
 
         setTimeout(() => {
@@ -439,9 +446,7 @@
       }
     }
 
-    const nameInput = document.getElementById('name');
     const buttons = form.querySelectorAll('button[data-response]');
-
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         const response = btn.getAttribute("data-response");
