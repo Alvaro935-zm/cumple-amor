@@ -9,7 +9,7 @@
 
     body {
       font-family: 'Poppins', Arial, sans-serif;
-      background-color: #f8f8f8;
+      background: linear-gradient(135deg, #f8e1f4, #e0c3fc);
       color: #333;
       text-align: center;
       padding: 50px 20px;
@@ -29,6 +29,12 @@
       width: 100%;
       text-align: left;
       transition: transform 0.3s ease;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
     }
 
     .invitation:hover {
@@ -96,14 +102,15 @@
       border: none;
       border-radius: 30px;
       cursor: pointer;
-      background-color: #6a11cb;
+      background: linear-gradient(to right, #a14cd8, #6a11cb);
       color: white;
-      transition: all 0.3s ease;
+      transition: all 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
       box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
     }
 
     .radio-group button:hover {
-      background-color: #7f2be0;
+      background: linear-gradient(to right, #b469f0, #7f2be0);
+      transform: scale(1.05);
       box-shadow: 0 8px 20px rgba(127, 43, 224, 0.6);
     }
 
@@ -162,9 +169,9 @@
   <div class="invitation">
     <h1>¡Estás Invitado!</h1>
     <p>Ven a celebrar el cumpleaños de <strong>Silvana</strong>.</p>
-    <p><strong>Fecha:</strong> 19 de Julio, 2025</p>
-    <p><strong>Hora:</strong> 19:00 hrs</p>
-    <p><strong>Lugar:</strong> Cuadro Verde 150, Dpto 48 torre 5. Estacion Central </p>
+    <p><strong>📅 Fecha:</strong> 19 de Julio, 2025</p>
+    <p><strong>⏰ Hora:</strong> 19:00 hrs</p>
+    <p><strong>📍 Lugar:</strong> Cuadro Verde 150, Dpto 48 torre 5. Estación Central</p>
 
     <form id="rsvp-form">
       <label for="name">Nombre:</label>
