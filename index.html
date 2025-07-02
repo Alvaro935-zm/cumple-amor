@@ -156,9 +156,9 @@
       color: #333;
     }
 
-    /* Contenedor y estilo para los botones de descarga y ubicación */
+    /* Botones descarga y ubicación */
     #buttons-container {
-      display: none; /* Solo mostrar cuando haya lista de regalos */
+      display: none;
       margin-top: 15px;
       display: flex;
       justify-content: center;
@@ -178,6 +178,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       white-space: nowrap;
+      text-align: center;
     }
 
     #buttons-container button:hover {
@@ -185,10 +186,23 @@
     }
 
     #map-button {
-      margin-top: 12px;
+      margin-top: 8px;
       width: 100%;
       max-width: none;
       font-size: 1rem;
+      background: #a14cd8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    #map-button:hover {
+      background: #7f2be0;
     }
 
     @media (max-width: 480px) {
@@ -235,8 +249,8 @@
       <p><strong>⏰ Hora:</strong> 19:00 hrs</p>
       <p><strong>📍 Lugar:</strong> Cuadro Verde 150, Dpto 48 torre 5. Estación Central</p>
 
-      <!-- Botón mostrar ubicación Google Maps -->
-      <button id="map-button" style="display:none;">📍 Mostrar ubicación en Google Maps</button>
+      <!-- Botón mostrar ubicación Google Maps siempre visible -->
+      <button id="map-button">📍 Mostrar ubicación en Google Maps</button>
 
       <form id="rsvp-form">
         <label for="name">Nombre:</label>
@@ -256,12 +270,11 @@
         <ul id="gifts"></ul>
       </div>
 
-      <!-- Botones descarga y ubicación juntos -->
+      <!-- Botones descarga PDF e Imagen -->
       <div id="buttons-container">
         <button id="download-pdf">📥 Descargar lista en PDF</button>
         <button id="download-image">📥 Descargar lista como imagen</button>
       </div>
-
     </div>
   </div>
 
@@ -303,7 +316,7 @@
   <!-- html2canvas para imagen -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-  <!-- Script Firebase original y descarga PDF/Imagen y ubicación -->
+  <!-- Script Firebase original + descargas + ubicación -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
@@ -334,27 +347,25 @@
     const form = document.getElementById('rsvp-form');
     const confirmationMessage = document.getElementById('confirmation-message');
     const giftList = document.getElementById('gift-list');
-    const nameInput = document.getElementById('name');
-    const buttons = form.querySelectorAll('button[data-response]');
+    const giftsUl = document.getElementById("gifts");
+    const buttonsContainer = document.getElementById('buttons-container');
     const downloadPdfBtn = document.getElementById('download-pdf');
     const downloadImageBtn = document.getElementById('download-image');
-    const buttonsContainer = document.getElementById('buttons-container');
     const mapButton = document.getElementById('map-button');
 
-    // Dirección para Google Maps (puedes cambiar la dirección aquí)
-    const googleMapsUrl = "https://www.google.com/maps?q=Cuadro+Verde+150,+Dpto+48+torre+5,+Estación+Central,+Chile";
+    // URL ubicación Google Maps
+    const googleMapsUrl = "https://www.google.com/maps/place/Cuadro+Verde+150,+Dpto+48+torre+5,+Estaci%C3%B3n+Central";
 
-    // Variable global para lista de regalos
+    // Variable global para guardar regalos cargados
     window.regalosParaExportar = [];
 
-    // Mostrar lista y activar botones
     async function mostrarListaDeRegalos() {
-      const giftsUl = document.getElementById("gifts");
       giftsUl.innerHTML = "";
-      let regalos = [];
+      window.regalosParaExportar = [];
 
       try {
         const snapshot = await getDocs(collection(db, "regalos"));
+        const regalos = [];
 
         snapshot.forEach(docSnap => {
           const data = docSnap.data();
@@ -365,23 +376,19 @@
 
         if (regalos.length === 0) {
           giftsUl.innerHTML = "<li>No hay sugerencias por ahora.</li>";
-          giftList.style.display = "block";
           buttonsContainer.style.display = 'none';
-          window.regalosParaExportar = [];
         } else {
           regalos.sort().forEach(nombre => {
             const li = document.createElement("li");
             li.textContent = nombre;
             giftsUl.appendChild(li);
           });
-          giftList.style.display = "block";
-          buttonsContainer.style.display = 'flex';
           window.regalosParaExportar = regalos;
+          buttonsContainer.style.display = 'flex';
+          giftList.style.display = "block";
         }
-
       } catch (error) {
         console.error("Error al obtener los regalos:", error);
-        buttonsContainer.style.display = 'none';
       }
     }
 
@@ -413,7 +420,6 @@
         confirmationMessage.style.display = 'block';
         confirmationMessage.textContent = `Gracias, ${name}, tu respuesta ha sido registrada.`;
 
-        // Mostrar botones solo si asiste
         if (attending === "Sí") {
           mostrarListaDeRegalos();
         } else {
@@ -421,9 +427,6 @@
           buttonsContainer.style.display = 'none';
           window.regalosParaExportar = [];
         }
-
-        // Mostrar botón de mapa siempre
-        mapButton.style.display = 'inline-block';
 
         setTimeout(() => {
           confirmationMessage.style.display = 'none';
@@ -435,6 +438,9 @@
         console.error("Error al guardar en Firestore: ", error);
       }
     }
+
+    const nameInput = document.getElementById('name');
+    const buttons = form.querySelectorAll('button[data-response]');
 
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -490,4 +496,3 @@
   </script>
 </body>
 </html>
-
