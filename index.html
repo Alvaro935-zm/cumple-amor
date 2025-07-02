@@ -10,7 +10,6 @@
     body {
       font-family: 'Poppins', Arial, sans-serif;
       background: linear-gradient(135deg, #f8e1f4, #e0c3fc);
-      color: #fff;
       text-align: center;
       padding: 50px 20px;
       min-height: 100vh;
@@ -20,7 +19,8 @@
     }
 
     .invitation {
-      background-image: url('https://raw.githubusercontent.com/Alvaro935-zm/cumple-amor/main/fondo.jpg');
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                  url('https://raw.githubusercontent.com/Alvaro935-zm/cumple-amor/main/fondo.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -31,10 +31,9 @@
       max-width: 420px;
       width: 100%;
       text-align: left;
-      position: relative;
       animation: fadeIn 0.8s ease-out;
       color: #fff;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
     }
 
     @keyframes fadeIn {
@@ -130,7 +129,7 @@
 
     #gifts li {
       padding: 10px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #ccc;
       font-size: 1rem;
       color: #fff;
     }
@@ -192,7 +191,6 @@
       collection,
       getDocs
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDbm3CjznAyb5BUfivQ0xervBzBVFEvNnc",
@@ -200,12 +198,10 @@
       projectId: "cumple-75803",
       storageBucket: "cumple-75803.firebasestorage.app",
       messagingSenderId: "1098075718162",
-      appId: "1:1098075718162:web:2135240f95375f15dc8ecb",
-      measurementId: "G-7V3DJHP675"
+      appId: "1:1098075718162:web:2135240f95375f15dc8ecb"
     };
 
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     const form = document.getElementById('rsvp-form');
@@ -306,4 +302,3 @@
   </script>
 </body>
 </html>
-
